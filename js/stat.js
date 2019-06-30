@@ -6,11 +6,12 @@ window.renderStatistics = function (ctx, names, times) {
   var BAR_WIDTH = 40;
   var BAR_HEIGHT = 150;
   var BAR_GAP = 50;
+  var CLOUD_WIDTH = 420;
+  var CLOUD_HEIGHT = 270;
+  var CLOUD_X = 100;
+  var CLOUD_Y = 10;
 
-  drawCloud(ctx, 110, 20, 'rgba(0, 0, 0, 0.7)');
-  drawCloud(ctx, 100, 10, 'rgba(255, 255, 255, 1)');
-  drawText(ctx, 130, 40, 'Ура вы победили!', 'rgba(0, 0, 0, 1)');
-  drawText(ctx, 130, 60, 'Список результатов:', 'rgba(0, 0, 0, 1)');
+  drawStatsBackground(ctx, CLOUD_X, CLOUD_Y, CLOUD_WIDTH, CLOUD_HEIGHT);
 
   var timeWinner = getMaxNumber(times);
   var x = BAR_X;
@@ -20,10 +21,17 @@ window.renderStatistics = function (ctx, names, times) {
   }
 };
 
+var drawStatsBackground = function (ctx, CLOUD_X, CLOUD_Y, CLOUD_WIDTH, CLOUD_HEIGHT) {
+  drawCloud(ctx, CLOUD_X, CLOUD_Y, 10, CLOUD_WIDTH, CLOUD_HEIGHT, 'rgba(0, 0, 0, 0.7)');
+  drawCloud(ctx, CLOUD_X, CLOUD_Y, 0, CLOUD_WIDTH, CLOUD_HEIGHT, 'rgba(255, 255, 255, 1)');
+  drawText(ctx, 130, 40, 'Ура вы победили!', 'rgba(0, 0, 0, 1)');
+  drawText(ctx, 130, 60, 'Список результатов:', 'rgba(0, 0, 0, 1)');
+};
+
 // Получение случайного числа
-var getRandomNumber = function () {
-  var RandomNumber = Math.floor(Math.random() * 10 + 1) / 10;
-  return RandomNumber;
+var getRandomNumber = function (minNum, maxNum) {
+  var randomNumber = Math.floor(Math.random() * maxNum + minNum) / 10;
+  return randomNumber;
 };
 
 // Получение максимального элемента из масива
@@ -39,9 +47,11 @@ var getMaxNumber = function (times) {
 };
 
 // Нарисовать облако
-var drawCloud = function (ctx, x, y, color) {
+var drawCloud = function (ctx, CLOUD_X, CLOUD_Y, cloudGap, CLOUD_WIDTH, CLOUD_HEIGHT, color) {
   ctx.fillStyle = color;
-  ctx.fillRect(x, y, 420, 270);
+  var x = CLOUD_X + cloudGap;
+  var y = CLOUD_Y + cloudGap;
+  ctx.fillRect(x, y, CLOUD_WIDTH, CLOUD_HEIGHT);
 };
 // Нарисовать текст
 var drawText = function (ctx, x, y, text, color) {
@@ -52,20 +62,12 @@ var drawText = function (ctx, x, y, text, color) {
 
 // Рисование колонки
 var drawColumn = function (ctx, name, time, timeWinner, x, BAR_Y, BAR_WIDTH, BAR_HEIGHT) {
-  var barOpacity = getRandomNumber();
+  var barOpacity = getRandomNumber(1, 10);
   time = Math.round(time);
-  if (name === 'Вы') {
-    ctx.fillStyle = 'rgba(255, 0, 0, 1)';
-  } else {
-    ctx.fillStyle = 'rgba(0, 0, 255,' + barOpacity + ')';
-  }
-  if (time === timeWinner) {
-    var barCurrentHeight = BAR_HEIGHT;
-  } else {
-    barCurrentHeight = Math.round(time * BAR_HEIGHT / timeWinner);
-  }
+  ctx.fillStyle = name === 'Вы' ? 'rgba(255, 0, 0, 1)' : ctx.fillStyle = 'rgba(0, 0, 255,' + barOpacity + ')';
+  var barCurrentHeight = time === timeWinner ? BAR_HEIGHT : barCurrentHeight = Math.round(time * BAR_HEIGHT / timeWinner);
   ctx.fillRect(x, BAR_Y + BAR_HEIGHT - barCurrentHeight, 40, barCurrentHeight);
-  ctx.fillStyle = 'rgba(0, 0, 0, 1)';
+  ctx.fillStyle = 'rgb(0, 0, 0)';
   ctx.fillText(time, x, 90 + BAR_HEIGHT - barCurrentHeight);
   ctx.fillText(name, x, 270);
 };
